@@ -5,7 +5,508 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Flo Networks — Engagement Letters Tracker</title>
 <style>
-  *, *::before, *::after { b<!DOCTYPE html>
+  *, *::before, *::after { b<!DOCTYPE htm<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flo Networks — Engagement Letters Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #ffffff;
+    --bg-soft:   #f7f7f6;
+    --bg-subtle: #f0efed;
+    --border:    rgba(0,0,0,0.10);
+    --border-md: rgba(0,0,0,0.18);
+    --text:      #1a1a18;
+    --text-muted:#6b6b67;
+    --text-dim:  #9b9b96;
+    --blue:      #185FA5;
+    --blue-bg:   #E6F1FB;
+    --purple:    #534AB7;
+    --purple-bg: #EEEDFE;
+    --green:     #3B6D11;
+    --green-bg:  #EAF3DE;
+    --amber:     #854F0B;
+    --amber-bg:  #FAEEDA;
+    --gray:      #5F5E5A;
+    --gray-bg:   #F1EFE8;
+    --radius:    8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-logo {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--text); display: flex; align-items: center; justify-content: center;
+  }
+  .header-logo svg { width: 20px; height: 20px; fill: var(--bg); }
+  .header-name { font-size: 15px; font-weight: 500; }
+  .header-sub  { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .last-updated { font-size: 12px; color: var(--text-dim); }
+
+  /* ── Setup banner ── */
+  #setupBanner {
+    background: #fff8e6;
+    border: 0.5px solid #f0c060;
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    margin: 24px 32px 0;
+    display: none;
+  }
+  #setupBanner h2 { font-size: 15px; font-weight: 500; margin-bottom: 8px; color: #7a4800; }
+  #setupBanner ol { padding-left: 20px; color: #7a4800; font-size: 13px; line-height: 2; }
+  #setupBanner code {
+    background: rgba(0,0,0,0.07); border-radius: 4px;
+    padding: 1px 6px; font-size: 12px; font-family: monospace;
+  }
+  .input-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .input-row input {
+    flex: 1; min-width: 240px; padding: 8px 12px;
+    border: 0.5px solid var(--border-md); border-radius: var(--radius);
+    font-size: 13px; background: #fff; color: var(--text);
+  }
+  .btn-primary {
+    padding: 8px 16px; border-radius: var(--radius);
+    background: var(--text); color: #fff;
+    border: none; font-size: 13px; font-weight: 500; cursor: pointer;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  /* ── Main layout ── */
+  .main { padding: 24px 32px 40px; }
+
+  /* ── Metric cards ── */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .metric {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+  }
+  .metric-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+  .metric-value { font-size: 24px; font-weight: 500; }
+  .metric-sub   { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* ── Filter bar ── */
+  .filter-bar {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 16px;
+  }
+  .filter-bar select,
+  .filter-bar input {
+    padding: 7px 11px;
+    border: 0.5px solid var(--border-md);
+    border-radius: var(--radius);
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .filter-bar input { flex: 1; min-width: 180px; }
+
+  /* ── Table ── */
+  .table-wrap {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left; font-weight: 500; font-size: 11px;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em;
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--border);
+    white-space: nowrap;
+    background: var(--bg-soft);
+  }
+  tbody td {
+    padding: 11px 14px;
+    border-bottom: 0.5px solid var(--border);
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--bg-soft); }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 500;
+    padding: 2px 9px; border-radius: 20px; white-space: nowrap;
+  }
+  .b-audit      { background: var(--blue-bg);   color: var(--blue);   }
+  .b-consulting { background: var(--purple-bg);  color: var(--purple); }
+  .b-active     { background: var(--green-bg);   color: var(--green);  }
+  .b-pending    { background: var(--amber-bg);   color: var(--amber);  }
+  .b-closed     { background: var(--gray-bg);    color: var(--gray);   }
+
+  /* ── Progress bar ── */
+  .prog-wrap { width: 60px; }
+  .prog-pct  { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+  .prog-bar  { height: 5px; background: var(--bg-subtle); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+
+  /* ── Empty / loading / error states ── */
+  .state-row td {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-muted); font-size: 13px;
+  }
+  .spinner {
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid var(--border-md);
+    border-top-color: var(--text-muted);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: middle; margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Footer note ── */
+  .foot { margin-top: 12px; font-size: 12px; color: var(--text-dim); text-align: right; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .header, .main { padding-left: 16px; padding-right: 16px; }
+    #setupBanner { margin: 16px 16px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">
+      <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="7" height="7" rx="1.5"/>
+        <rect x="11" y="2" width="7" height="7" rx="1.5"/>
+        <rect x="2" y="11" width="7" height="7" rx="1.5"/>
+        <rect x="11" y="11" width="7" height="7" rx="1.5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-name">Flo Networks</div>
+      <div class="header-sub">Engagement Letters Tracker</div>
+    </div>
+  </div>
+  <div class="last-updated" id="lastUpdated"></div>
+</header>
+
+<!-- ── SETUP BANNER ── -->
+<div id="setupBanner">
+  <h2>⚡ One-time setup — connect your Google Sheet</h2>
+  <ol>
+    <li>Open your Google Sheet and go to <strong>File → Share → Publish to web</strong></li>
+    <li>Under "Link", select the sheet tab and choose <strong>CSV</strong> format, then click <strong>Publish</strong></li>
+    <li>Copy the published CSV URL and paste it below</li>
+    <li>The sheet must have these column headers in row 1 (exact spelling):<br/>
+      <code>Client</code> &nbsp;<code>Type</code> &nbsp;<code>Scope</code> &nbsp;<code>Owner</code> &nbsp;<code>SignedDate</code> &nbsp;<code>ExpiryDate</code> &nbsp;<code>ContractAmt</code> &nbsp;<code>BilledAmt</code> &nbsp;<code>Status</code> &nbsp;<code>Notes</code>
+    </li>
+  </ol>
+  <div class="input-row">
+    <input type="url" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" />
+    <button class="btn-primary" onclick="connectSheet()">Connect sheet</button>
+  </div>
+  <p style="font-size:12px; color:#9a6500; margin-top:10px;">
+    The URL is saved in this browser only — your CFO will need to paste it once on their device too, or you can bake it in (see note at bottom of page).
+  </p>
+</div>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- Metrics -->
+  <div class="metrics" id="metrics">
+    <div class="metric"><div class="metric-label">Total contracted</div><div class="metric-value" id="mContracted">—</div><div class="metric-sub" id="mCount">— engagements</div></div>
+    <div class="metric"><div class="metric-label">Total billed</div><div class="metric-value" id="mBilled">—</div><div class="metric-sub" id="mPct">—% of portfolio</div></div>
+    <div class="metric"><div class="metric-label">Remaining to bill</div><div class="metric-value" id="mRemaining">—</div><div class="metric-sub">Outstanding balance</div></div>
+    <div class="metric"><div class="metric-label">Active</div><div class="metric-value" id="mActive">—</div><div class="metric-sub" id="mPending">— pending signature</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <select id="fType" onchange="applyFilters()">
+      <option value="">All types</option>
+      <option value="Audit">Audit</option>
+      <option value="Consulting">Consulting</option>
+    </select>
+    <select id="fStatus" onchange="applyFilters()">
+      <option value="">All statuses</option>
+      <option value="Active">Active</option>
+      <option value="Pending signature">Pending signature</option>
+      <option value="Closed">Closed</option>
+    </select>
+    <select id="fOwner" onchange="applyFilters()">
+      <option value="">All owners</option>
+    </select>
+    <input id="fSearch" type="text" placeholder="Search client or firm…" oninput="applyFilters()" />
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Client / Firm</th>
+            <th>Type</th>
+            <th>Scope</th>
+            <th>Internal owner</th>
+            <th>Signed</th>
+            <th>Expires</th>
+            <th>Contract amt.</th>
+            <th>Billed amt.</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr class="state-row"><td colspan="11"><span class="spinner"></span> Loading data…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</main>
+
+<!-- ── SCRIPT ── -->
+<script>
+// ─────────────────────────────────────────────
+// OPTIONAL: hard-code your sheet URL here so
+// neither you nor your CFO needs to paste it.
+// Replace the empty string with your CSV URL.
+// Example:
+// const HARDCODED_URL = 'https://docs.google.com/spreadsheets/d/SHEET_ID/pub?gid=0&single=true&output=csv';
+// ─────────────────────────────────────────────
+const HARDCODED_URL = 'https://docs.google.com/spreadsheets/d/12fWw8jpJjMVI_7DvlsXen3v0aZElPRmQdEEMpvWUUB8/gviz/tq?tqx=out:json';
+
+const LS_KEY = 'flo_sheet_url';
+let allRows = [];
+
+// ── Startup ──
+window.addEventListener('DOMContentLoaded', () => {
+  const url = HARDCODED_URL || localStorage.getItem(LS_KEY) || '';
+  if (url) {
+    fetchSheet(url);
+  } else {
+    document.getElementById('setupBanner').style.display = 'block';
+    setEmpty('Connect your Google Sheet using the banner above.');
+  }
+});
+
+// ── Connect sheet from banner ──
+function connectSheet() {
+  const url = document.getElementById('sheetUrlInput').value.trim();
+  if (!url) { alert('Please paste the CSV URL first.'); return; }
+  localStorage.setItem(LS_KEY, url);
+  document.getElementById('setupBanner').style.display = 'none';
+  fetchSheet(url);
+}
+
+// ── Fetch via Google Visualization API (no CORS proxy needed) ──
+async function fetchSheet(url) {
+  setLoading();
+  try {
+    // Build gviz URL from whatever format is passed in
+    let gvizUrl;
+    if (url.includes('gviz/tq')) {
+      gvizUrl = url; // already a gviz URL
+    } else {
+      const mReg = url.match(/spreadsheets\/d\/([^\/]+)/);
+      if (!mReg) throw new Error('Could not parse a Google Sheets ID from that URL.');
+      gvizUrl = `https://docs.google.com/spreadsheets/d/${mReg[1]}/gviz/tq?tqx=out:json`;
+    }
+
+    const res = await fetch(gvizUrl);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const raw = await res.text();
+
+    // Google wraps JSON in: /*O_o*/ google.visualization.Query.setResponse({...});
+    const jsonStr = raw.replace(/^\/\*[\s\S]*?\*\/\s*[^(]+\(/, '').replace(/\);?\s*$/, '');
+    const json = JSON.parse(jsonStr);
+
+    if (!json.table || !json.table.cols) throw new Error('Unexpected response. Make sure the sheet is published to the web.');
+
+    const cols = json.table.cols.map(c => (c.label || c.id).trim());
+    allRows = (json.table.rows || []).map(row => {
+      const r = {};
+      cols.forEach((col, i) => {
+        const cell = row.c ? row.c[i] : null;
+        r[col] = (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v) : '';
+      });
+      return r;
+    }).filter(r => r['Client'] || r['Scope']);
+
+    if (allRows.length === 0) throw new Error('No data rows found. Make sure headers in row 1 match exactly: Client, Type, Scope, Owner, SignedDate, ExpiryDate, ContractAmt, BilledAmt, Status, Notes');
+
+    document.getElementById('lastUpdated').textContent = 'Last fetched: ' + new Date().toLocaleString('en-US', { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+    populateOwnerFilter();
+    applyFilters();
+  } catch (err) {
+    setError('Could not load data: ' + err.message);
+    document.getElementById('setupBanner').style.display = 'block';
+  }
+}
+
+// ── CSV parser (handles quoted fields) ──
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
+  const headers = splitCSVLine(lines[0]);
+  return lines.slice(1).map(line => {
+    const vals = splitCSVLine(line);
+    const row = {};
+    headers.forEach((h, i) => row[h.trim()] = (vals[i] || '').trim());
+    return row;
+  }).filter(r => r['Client'] || r['Scope']);
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  result.push(cur);
+  return result;
+}
+
+// ── Filters ──
+function applyFilters() {
+  const t = document.getElementById('fType').value;
+  const s = document.getElementById('fStatus').value;
+  const o = document.getElementById('fOwner').value;
+  const q = document.getElementById('fSearch').value.toLowerCase();
+  const rows = allRows.filter(r =>
+    (!t || r['Type'] === t) &&
+    (!s || r['Status'] === s) &&
+    (!o || r['Owner'] === o) &&
+    (!q || (r['Client']||'').toLowerCase().includes(q) || (r['Scope']||'').toLowerCase().includes(q))
+  );
+  renderMetrics(rows);
+  renderTable(rows);
+  document.getElementById('foot').textContent = rows.length + ' of ' + allRows.length + ' records';
+}
+
+function populateOwnerFilter() {
+  const owners = [...new Set(allRows.map(r => r['Owner']).filter(Boolean))].sort();
+  const sel = document.getElementById('fOwner');
+  sel.innerHTML = '<option value="">All owners</option>' + owners.map(o => `<option value="${o}">${o}</option>`).join('');
+}
+
+// ── Metrics ──
+function renderMetrics(rows) {
+  const sum = k => rows.reduce((s, r) => s + (parseFloat(r[k]) || 0), 0);
+  const totalC = sum('ContractAmt');
+  const totalB = sum('BilledAmt');
+  const active  = rows.filter(r => r['Status'] === 'Active').length;
+  const pending = rows.filter(r => r['Status'] === 'Pending signature').length;
+  const pct = totalC > 0 ? Math.round((totalB / totalC) * 100) : 0;
+  document.getElementById('mContracted').textContent = fmt(totalC);
+  document.getElementById('mCount').textContent      = rows.length + ' engagement' + (rows.length !== 1 ? 's' : '');
+  document.getElementById('mBilled').textContent     = fmt(totalB);
+  document.getElementById('mPct').textContent        = pct + '% of portfolio';
+  document.getElementById('mRemaining').textContent  = fmt(totalC - totalB);
+  document.getElementById('mActive').textContent     = active;
+  document.getElementById('mPending').textContent    = pending + ' pending signature';
+}
+
+// ── Table ──
+function renderTable(rows) {
+  const tbody = document.getElementById('tbody');
+  if (rows.length === 0) { setEmpty('No records match the selected filters.'); return; }
+  tbody.innerHTML = rows.map(r => {
+    const c = parseFloat(r['ContractAmt']) || 0;
+    const b = parseFloat(r['BilledAmt'])   || 0;
+    const p = c > 0 ? Math.round((b / c) * 100) : 0;
+    const fc = p >= 100 ? '#1D9E75' : p >= 50 ? '#378ADD' : '#EF9F27';
+    return `<tr>
+      <td style="font-weight:500; white-space:nowrap">${esc(r['Client'])}</td>
+      <td>${typeBadge(r['Type'])}</td>
+      <td style="color:#6b6b67; min-width:140px">${esc(r['Scope'])}</td>
+      <td style="white-space:nowrap">${esc(r['Owner']) || '—'}</td>
+      <td style="white-space:nowrap; color:#6b6b67">${fmtDate(r['SignedDate'])}</td>
+      <td style="white-space:nowrap; color:#6b6b67">${fmtDate(r['ExpiryDate'])}</td>
+      <td style="white-space:nowrap">${fmt(c)}</td>
+      <td style="white-space:nowrap">${fmt(b)}</td>
+      <td>
+        <div class="prog-wrap">
+          <div class="prog-pct">${p}%</div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(p,100)}%; background:${fc}"></div></div>
+        </div>
+      </td>
+      <td>${statusBadge(r['Status'])}</td>
+      <td style="color:#6b6b67; font-size:12px; min-width:100px">${esc(r['Notes']) || ''}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── State helpers ──
+function setLoading() {
+  document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="11"><span class="spinner"></span> Loading data…</td></tr>`;
+}
+function setEmpty(msg) {
+  document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="11">${msg}</td></tr>`;
+}
+function setError(msg) {
+  document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="11" style="color:#A32D2D">${msg}</td></tr>`;
+}
+
+// ── Formatting ──
+const fmt = v => isNaN(v) || v === '' ? '—' : '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 0 });
+const fmtDate = d => {
+  if (!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  return isNaN(dt) ? d : dt.toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
+};
+const esc = s => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function typeBadge(t) {
+  if (!t) return '—';
+  const cls = t.toLowerCase().includes('audit') ? 'b-audit' : 'b-consulting';
+  return `<span class="badge ${cls}">${esc(t)}</span>`;
+}
+function statusBadge(s) {
+  const map = { 'Active':'b-active', 'Pending signature':'b-pending', 'Closed':'b-closed' };
+  return `<span class="badge ${map[s] || 'b-closed'}">${esc(s) || '—'}</span>`;
+}
+</script>
+
+</body>
+</html>
+l>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
