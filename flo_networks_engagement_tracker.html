@@ -7,82 +7,133 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #ffffff; --bg-soft: #f7f7f6; --bg-subtle: #f0efed;
-    --border: rgba(0,0,0,0.10); --border-md: rgba(0,0,0,0.18);
-    --text: #1a1a18; --text-muted: #6b6b67; --text-dim: #9b9b96;
-    --blue: #185FA5; --blue-bg: #E6F1FB; --purple: #534AB7; --purple-bg: #EEEDFE;
-    --green: #3B6D11; --green-bg: #EAF3DE; --amber: #854F0B; --amber-bg: #FAEEDA;
-    --gray: #5F5E5A; --gray-bg: #F1EFE8; --radius: 8px; --radius-lg: 12px;
+    --bg:          #0d1117;
+    --bg-card:     #161c26;
+    --bg-row:      #1a2030;
+    --bg-hover:    #1f2740;
+    --border:      rgba(255,255,255,0.07);
+    --border-md:   rgba(255,255,255,0.14);
+    --teal:        #00c2b3;
+    --teal-dim:    rgba(0,194,179,0.12);
+    --teal-glow:   rgba(0,194,179,0.25);
+    --text:        #e8eaf0;
+    --text-muted:  #8a93a8;
+    --text-dim:    #545d72;
+    --blue:        #4d9ef5;
+    --blue-bg:     rgba(77,158,245,0.12);
+    --purple:      #9b8cf5;
+    --purple-bg:   rgba(155,140,245,0.12);
+    --green:       #34d399;
+    --green-bg:    rgba(52,211,153,0.12);
+    --amber:       #fbbf24;
+    --amber-bg:    rgba(251,191,36,0.12);
+    --gray:        #8a93a8;
+    --gray-bg:     rgba(138,147,168,0.12);
+    --radius:      8px;
+    --radius-lg:   12px;
   }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-soft); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
-  .header { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .header-brand { display: flex; align-items: center; gap: 12px; }
-  .header-logo { width: 36px; height: 36px; border-radius: 9px; background: var(--text); display: flex; align-items: center; justify-content: center; }
-  .header-logo svg { width: 20px; height: 20px; fill: var(--bg); }
-  .header-name { font-size: 15px; font-weight: 500; }
-  .header-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+
+  /* ── Header ── */
+  .header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .header-brand { display: flex; align-items: center; gap: 14px; }
+  .header-logo { height: 32px; }
+  .divider { width: 1px; height: 28px; background: var(--border-md); }
+  .header-sub { font-size: 13px; color: var(--text-muted); letter-spacing: .01em; }
   .last-updated { font-size: 12px; color: var(--text-dim); }
-  .main { padding: 24px 32px 40px; }
 
-  /* ── Metrics ── */
-  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
-  .metric { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; cursor: pointer; transition: box-shadow .15s; position: relative; }
-  .metric:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
-  .metric-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
-  .metric-value { font-size: 24px; font-weight: 500; }
-  .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-  .metric-hint { font-size: 10px; color: var(--text-dim); margin-top: 6px; }
+  /* ── Main ── */
+  .main { padding: 28px 32px 48px; }
 
-  /* ── Peek modal ── */
-  .peek-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:200; align-items:center; justify-content:center; }
+  /* ── KPI Cards ── */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .metric {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: border-color .2s, box-shadow .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .metric::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: var(--teal); opacity:0; transition: opacity .2s; }
+  .metric:hover { border-color: var(--teal); box-shadow: 0 0 0 1px var(--teal-glow), 0 4px 20px rgba(0,0,0,0.4); }
+  .metric:hover::before { opacity:1; }
+  .metric-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .metric-value { font-size: 26px; font-weight: 600; color: var(--text); }
+  .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+  .metric-hint { font-size: 10px; color: var(--teal); margin-top: 8px; opacity: .7; }
+
+  /* ── Peek Modal ── */
+  .peek-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200; align-items:center; justify-content:center; backdrop-filter: blur(2px); }
   .peek-bg.open { display:flex; }
-  .peek-box { background:var(--bg); border-radius:var(--radius-lg); border:0.5px solid var(--border); padding:24px; width:420px; max-width:95vw; max-height:80vh; overflow-y:auto; }
-  .peek-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
-  .peek-title { font-size:15px; font-weight:500; }
-  .peek-close { background:none; border:none; cursor:pointer; font-size:20px; color:var(--text-muted); line-height:1; }
+  .peek-box { background: var(--bg-card); border: 1px solid var(--border-md); border-radius: var(--radius-lg); padding: 24px; width: 520px; max-width: 95vw; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  .peek-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+  .peek-title { font-size:15px; font-weight:600; color: var(--text); }
+  .peek-close { background:none; border:none; cursor:pointer; font-size:20px; color:var(--text-muted); line-height:1; padding: 2px 6px; border-radius: 4px; }
+  .peek-close:hover { background: var(--bg-hover); color: var(--text); }
   .peek-table { width:100%; border-collapse:collapse; font-size:13px; }
-  .peek-table th { text-align:left; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; padding:6px 8px; border-bottom:0.5px solid var(--border); }
-  .peek-table td { padding:8px 8px; border-bottom:0.5px solid var(--border); }
+  .peek-table th { text-align:left; font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; padding:7px 10px; border-bottom:1px solid var(--border); }
+  .peek-table td { padding:9px 10px; border-bottom:1px solid var(--border); color: var(--text); }
   .peek-table tr:last-child td { border-bottom:none; }
-  .peek-rank { font-size:11px; color:var(--text-dim); font-weight:500; width:20px; }
+  .peek-table tr:hover td { background: var(--bg-hover); }
+  .peek-rank { font-size:11px; color: var(--teal); font-weight:600; width:24px; }
+  .peek-scope { font-size:11px; color: var(--text-muted); margin-top:2px; }
 
   /* ── Filters ── */
   .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
-  .filter-bar select, .filter-bar input { padding: 7px 11px; border: 0.5px solid var(--border-md); border-radius: var(--radius); font-size: 13px; background: var(--bg); color: var(--text); }
+  .filter-bar select, .filter-bar input {
+    padding: 7px 11px; border: 1px solid var(--border-md); border-radius: var(--radius);
+    font-size: 13px; background: var(--bg-card); color: var(--text);
+    transition: border-color .15s;
+  }
+  .filter-bar select:focus, .filter-bar input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 2px var(--teal-dim); }
   .filter-bar input { flex: 1; min-width: 180px; }
+  .filter-bar select option { background: var(--bg-card); }
 
   /* ── Table ── */
-  .table-wrap { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
   .table-scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th { text-align: left; font-weight: 500; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; padding: 10px 14px; border-bottom: 0.5px solid var(--border); white-space: nowrap; background: var(--bg-soft); }
-  tbody td { padding: 11px 14px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+  thead th {
+    text-align: left; font-weight: 500; font-size: 10px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .06em; padding: 11px 14px;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+    background: rgba(0,194,179,0.04);
+  }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: var(--bg-soft); }
+  tbody tr:hover td { background: var(--bg-hover); }
 
   /* ── Badges ── */
   .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
-  .b-audit { background: var(--blue-bg); color: var(--blue); }
-  .b-consulting { background: var(--purple-bg); color: var(--purple); }
-  .b-active { background: var(--green-bg); color: var(--green); }
-  .b-pending { background: var(--amber-bg); color: var(--amber); }
-  .b-closed { background: var(--gray-bg); color: var(--gray); }
+  .b-audit      { background: var(--blue-bg);   color: var(--blue);   }
+  .b-consulting { background: var(--purple-bg);  color: var(--purple); }
+  .b-active     { background: var(--green-bg);   color: var(--green);  }
+  .b-pending    { background: var(--amber-bg);   color: var(--amber);  }
+  .b-closed     { background: var(--gray-bg);    color: var(--gray);   }
+  .b-currency   { background: var(--teal-dim);   color: var(--teal);   }
 
   /* ── Progress ── */
-  .prog-wrap { width: 60px; }
-  .prog-pct { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
-  .prog-bar { height: 5px; background: var(--bg-subtle); border-radius: 3px; overflow: hidden; }
+  .prog-wrap { width: 72px; }
+  .prog-pct { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .prog-bar { height: 4px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
   .prog-fill { height: 100%; border-radius: 3px; transition: width .3s; }
 
-  /* ── Link icon ── */
-  .doc-link { color: var(--blue); text-decoration: none; font-size: 16px; }
-  .doc-link:hover { opacity: 0.7; }
+  /* ── Doc link ── */
+  .doc-link { display:inline-flex; align-items:center; gap:4px; color: var(--teal); text-decoration: none; font-size: 12px; font-weight:500; padding: 2px 8px; border-radius: 5px; border: 1px solid var(--teal-dim); transition: background .15s; }
+  .doc-link:hover { background: var(--teal-dim); }
 
   /* ── States ── */
-  .state-row td { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px; }
-  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border-md); border-top-color: var(--text-muted); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 8px; }
+  .state-row td { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 13px; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border-md); border-top-color: var(--teal); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .foot { margin-top: 12px; font-size: 12px; color: var(--text-dim); text-align: right; }
+
+  /* ── Teal accent on teal numbers ── */
+  .amt-teal { color: var(--teal); font-weight: 500; }
+
   @media (max-width: 600px) { .header, .main { padding-left: 16px; padding-right: 16px; } }
 </style>
 </head>
@@ -90,18 +141,9 @@
 
 <header class="header">
   <div class="header-brand">
-    <div class="header-logo">
-      <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="2" width="7" height="7" rx="1.5"/>
-        <rect x="11" y="2" width="7" height="7" rx="1.5"/>
-        <rect x="2" y="11" width="7" height="7" rx="1.5"/>
-        <rect x="11" y="11" width="7" height="7" rx="1.5"/>
-      </svg>
-    </div>
-    <div>
-      <div class="header-name">Flo Networks</div>
-      <div class="header-sub">Engagement Letters Tracker</div>
-    </div>
+    <img class="header-logo" src="https://flo.net/wp-content/uploads/2022/02/flo-networks.webp" alt="Flō Networks" onerror="this.style.display='none'" />
+    <div class="divider"></div>
+    <div class="header-sub">Engagement Letters Tracker</div>
   </div>
   <div class="last-updated" id="lastUpdated"></div>
 </header>
@@ -109,37 +151,37 @@
 <main class="main">
 
   <!-- KPI Cards -->
-  <div class="metrics" id="metrics">
+  <div class="metrics">
     <div class="metric" onclick="openPeek('contracted')">
       <div class="metric-label">Total Contracted (USD)</div>
       <div class="metric-value" id="mContracted">—</div>
       <div class="metric-sub" id="mCount">— engagements</div>
-      <div class="metric-hint">↗ Click to see ranking</div>
+      <div class="metric-hint">↗ Click for ranking</div>
     </div>
     <div class="metric" onclick="openPeek('billed')">
       <div class="metric-label">Total Billed (USD)</div>
       <div class="metric-value" id="mBilled">—</div>
       <div class="metric-sub" id="mPct">—% of portfolio</div>
-      <div class="metric-hint">↗ Click to see ranking</div>
+      <div class="metric-hint">↗ Click for ranking</div>
     </div>
     <div class="metric" onclick="openPeek('remaining')">
       <div class="metric-label">Remaining to Bill (USD)</div>
       <div class="metric-value" id="mRemaining">—</div>
       <div class="metric-sub">Outstanding balance</div>
-      <div class="metric-hint">↗ Click to see ranking</div>
+      <div class="metric-hint">↗ Click for ranking</div>
     </div>
     <div class="metric" onclick="openPeek('active')">
-      <div class="metric-label">Active</div>
+      <div class="metric-label">Active Engagements</div>
       <div class="metric-value" id="mActive">—</div>
       <div class="metric-sub" id="mPending">— pending signature</div>
-      <div class="metric-hint">↗ Click to see ranking</div>
+      <div class="metric-hint">↗ Click for ranking</div>
     </div>
   </div>
 
   <!-- Filters -->
   <div class="filter-bar">
     <select id="fType" onchange="applyFilters()">
-      <option value="">All types</option>
+      <option value="">All services</option>
       <option value="Audit">Audit</option>
       <option value="Consulting">Consulting</option>
     </select>
@@ -155,33 +197,40 @@
     <select id="fOwner" onchange="applyFilters()">
       <option value="">All owners</option>
     </select>
-    <input id="fSearch" type="text" placeholder="Search client or firm…" oninput="applyFilters()" />
+    <input id="fSearch" type="text" placeholder="Search firm or scope…" oninput="applyFilters()" />
   </div>
 
   <!-- Table -->
+  <!-- Column order:
+       Firm | Subsidiary | Service | Scope | Internal Owner |
+       Signed | Completion | Status | Progress |
+       Contract Amt USD | Billed Amt USD | Next Pmt Date | Next Pmt USD |
+       Contract | Contract Currency | Contract Amt Local | Billed Amt Local |
+       Renewal Date | Notes
+  -->
   <div class="table-wrap">
     <div class="table-scroll">
       <table>
         <thead>
           <tr>
-            <th>Client / Firm</th>
+            <th>Firm</th>
             <th>Subsidiary</th>
-            <th>Type</th>
+            <th>Service</th>
             <th>Scope</th>
             <th>Internal Owner</th>
-            <th>Doc</th>
             <th>Signed</th>
-            <th>Expires</th>
-            <th>Renewal Date</th>
-            <th>Currency</th>
+            <th>Completion</th>
+            <th>Status</th>
+            <th>Progress</th>
             <th>Contract Amt. (USD)</th>
             <th>Billed Amt. (USD)</th>
             <th>Next Pmt. Date</th>
             <th>Next Pmt. (USD)</th>
+            <th>Contract</th>
+            <th>Contract Currency</th>
             <th>Contract Amt. (Local)</th>
             <th>Billed Amt. (Local)</th>
-            <th>Progress</th>
-            <th>Status</th>
+            <th>Renewal Date</th>
             <th>Notes</th>
           </tr>
         </thead>
@@ -203,7 +252,14 @@
       <button class="peek-close" onclick="closePeek()">✕</button>
     </div>
     <table class="peek-table">
-      <thead><tr><th>#</th><th>Client / Firm</th><th id="peekColHead" style="text-align:right">Amount</th></tr></thead>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Firm</th>
+          <th>Scope</th>
+          <th id="peekColHead" style="text-align:right">Amount (USD)</th>
+        </tr>
+      </thead>
       <tbody id="peekBody"></tbody>
     </table>
   </div>
@@ -211,71 +267,65 @@
 
 <script>
 const HARDCODED_URL = 'https://docs.google.com/spreadsheets/d/12fWw8jpJjMVI_7DvlsXen3v0aZElPRmQdEEMpvWUUB8/gviz/tq?tqx=out:json';
-
 let allRows = [];
 
 window.addEventListener('DOMContentLoaded', () => { fetchSheet(HARDCODED_URL); });
 
 // ── Parse Google's Date(yyyy,m,d) format ──
 function parseGoogleDate(val) {
-  if (!val) return '';
-  // gviz returns dates as "Date(2024,0,15)" — month is 0-indexed
+  if (!val) return '—';
   const m = String(val).match(/^Date\((\d+),(\d+),(\d+)\)/);
   if (m) {
-    const y = parseInt(m[1]), mo = parseInt(m[2]), d = parseInt(m[3]);
-    const dt = new Date(y, mo, d);
+    const dt = new Date(parseInt(m[1]), parseInt(m[2]), parseInt(m[3]));
     return dt.toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
   }
-  // Already a plain date string
   if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
     const dt = new Date(val + 'T00:00:00');
     return isNaN(dt) ? val : dt.toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
   }
-  return val;
+  return val || '—';
 }
 
 async function fetchSheet(url) {
   setLoading();
   try {
-    let gvizUrl = url.includes('gviz/tq') ? url :
+    const gvizUrl = url.includes('gviz/tq') ? url :
       `https://docs.google.com/spreadsheets/d/${(url.match(/spreadsheets\/d\/([^\/]+)/)||[])[1]}/gviz/tq?tqx=out:json`;
-
     const res = await fetch(gvizUrl);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const raw = await res.text();
-    const jsonStr = raw.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, '');
-    const json = JSON.parse(jsonStr);
+    const json = JSON.parse(raw.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
     if (!json.table || !json.table.cols) throw new Error('Unexpected response. Make sure the sheet is published.');
 
     const cols = json.table.cols.map(c => (c.label || c.id || '').trim());
-
     allRows = (json.table.rows || []).map(row => {
       const r = {};
       cols.forEach((col, i) => {
         const cell = row.c ? row.c[i] : null;
-        // Use formatted value (f) first, then raw value (v)
-        r[col] = (cell && cell.f !== null && cell.f !== undefined) ? String(cell.f) :
-                 (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v) : '';
+        // For dates, prefer raw value (v) so we can parse Date(...) format
+        // For numbers, prefer formatted value (f) but we need raw for math
+        r[col] = (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v) : '';
       });
       return r;
     }).filter(r => r['Client'] || r['Scope']);
 
-    if (allRows.length === 0) throw new Error('No data rows found. Check headers: Client, Type, Scope, Owner, Subsidiary, DocLink, SignedDate, ExpiryDate, RenewalDate, Currency, ContractAmt, BilledAmt, NextPmtDate, NextPmtAmt, ContractAmtLocal, BilledAmtLocal, Status, Notes');
+    if (allRows.length === 0) throw new Error('No data rows found. Expected headers: Client, Type, Scope, Owner, Subsidiary, DocLink, SignedDate, ExpiryDate, RenewalDate, Currency, ContractAmt, BilledAmt, NextPmtDate, NextPmtAmt, ContractAmtLocal, BilledAmtLocal, Status, Notes');
 
-    document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleString('en-US', { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+    document.getElementById('lastUpdated').textContent =
+      'Last updated: ' + new Date().toLocaleString('en-US', { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
     populateFilters();
     applyFilters();
-  } catch (err) {
+  } catch(err) {
     setError('Could not load data: ' + err.message);
   }
 }
 
 function applyFilters() {
-  const t = document.getElementById('fType').value;
-  const s = document.getElementById('fStatus').value;
-  const o = document.getElementById('fOwner').value;
+  const t   = document.getElementById('fType').value;
+  const s   = document.getElementById('fStatus').value;
+  const o   = document.getElementById('fOwner').value;
   const sub = document.getElementById('fSubsidiary').value;
-  const q = document.getElementById('fSearch').value.toLowerCase();
+  const q   = document.getElementById('fSearch').value.toLowerCase();
   const rows = allRows.filter(r =>
     (!t   || r['Type'] === t) &&
     (!s   || r['Status'] === s) &&
@@ -291,10 +341,10 @@ function applyFilters() {
 function populateFilters() {
   const owners = [...new Set(allRows.map(r => r['Owner']).filter(Boolean))].sort();
   const subs   = [...new Set(allRows.map(r => r['Subsidiary']).filter(Boolean))].sort();
-  const oSel = document.getElementById('fOwner');
-  const sSel = document.getElementById('fSubsidiary');
-  oSel.innerHTML = '<option value="">All owners</option>'      + owners.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
-  sSel.innerHTML = '<option value="">All subsidiaries</option>' + subs.map(s  => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  document.getElementById('fOwner').innerHTML =
+    '<option value="">All owners</option>' + owners.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+  document.getElementById('fSubsidiary').innerHTML =
+    '<option value="">All subsidiaries</option>' + subs.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
 }
 
 function renderMetrics(rows) {
@@ -314,39 +364,39 @@ function renderMetrics(rows) {
 }
 
 function renderTable(rows) {
-  if (rows.length === 0) { setEmpty('No records match the selected filters.'); return; }
+  if (!rows.length) { setEmpty('No records match the selected filters.'); return; }
   document.getElementById('tbody').innerHTML = rows.map(r => {
     const c  = parseFloat(r['ContractAmt']) || 0;
     const b  = parseFloat(r['BilledAmt'])   || 0;
     const p  = c > 0 ? Math.min(Math.round((b / c) * 100), 100) : 0;
-    const fc = p >= 100 ? '#1D9E75' : p >= 50 ? '#378ADD' : '#EF9F27';
+    const fc = p >= 100 ? '#34d399' : p >= 50 ? '#4d9ef5' : '#fbbf24';
     const docCell = r['DocLink']
-      ? `<a class="doc-link" href="${esc(r['DocLink'])}" target="_blank" title="Open document">📄</a>`
-      : '—';
+      ? `<a class="doc-link" href="${esc(r['DocLink'])}" target="_blank">📄 View</a>`
+      : '<span style="color:var(--text-dim)">—</span>';
     return `<tr>
-      <td style="font-weight:500;white-space:nowrap">${esc(r['Client'])}</td>
-      <td style="white-space:nowrap">${esc(r['Subsidiary'])||'—'}</td>
+      <td style="font-weight:500;white-space:nowrap;color:var(--text)">${esc(r['Client'])}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${esc(r['Subsidiary'])||'—'}</td>
       <td>${typeBadge(r['Type'])}</td>
-      <td style="color:var(--text-muted);min-width:140px">${esc(r['Scope'])}</td>
-      <td style="white-space:nowrap">${esc(r['Owner'])||'—'}</td>
-      <td style="text-align:center">${docCell}</td>
-      <td style="white-space:nowrap;color:var(--text-muted)">${parseGoogleDate(r['SignedDate'])}</td>
-      <td style="white-space:nowrap;color:var(--text-muted)">${parseGoogleDate(r['ExpiryDate'])}</td>
-      <td style="white-space:nowrap;color:var(--text-muted)">${parseGoogleDate(r['RenewalDate'])}</td>
-      <td style="text-align:center"><span class="badge b-closed">${esc(r['Currency'])||'—'}</span></td>
-      <td style="white-space:nowrap">${fmt(c)}</td>
-      <td style="white-space:nowrap">${fmt(b)}</td>
-      <td style="white-space:nowrap;color:var(--text-muted)">${parseGoogleDate(r['NextPmtDate'])}</td>
-      <td style="white-space:nowrap">${fmtNum(r['NextPmtAmt'])}</td>
-      <td style="white-space:nowrap;color:var(--text-muted)">${fmtNum(r['ContractAmtLocal'])}</td>
-      <td style="white-space:nowrap;color:var(--text-muted)">${fmtNum(r['BilledAmtLocal'])}</td>
+      <td style="color:var(--text-muted);min-width:150px">${esc(r['Scope'])}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${esc(r['Owner'])||'—'}</td>
+      <td style="white-space:nowrap;color:var(--text-dim)">${parseGoogleDate(r['SignedDate'])}</td>
+      <td style="white-space:nowrap;color:var(--text-dim)">${parseGoogleDate(r['ExpiryDate'])}</td>
+      <td>${statusBadge(r['Status'])}</td>
       <td>
         <div class="prog-wrap">
           <div class="prog-pct">${p}%</div>
           <div class="prog-bar"><div class="prog-fill" style="width:${p}%;background:${fc}"></div></div>
         </div>
       </td>
-      <td>${statusBadge(r['Status'])}</td>
+      <td style="white-space:nowrap" class="amt-teal">${fmt(c)}</td>
+      <td style="white-space:nowrap" class="amt-teal">${fmt(b)}</td>
+      <td style="white-space:nowrap;color:var(--text-dim)">${parseGoogleDate(r['NextPmtDate'])}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${fmtNum(r['NextPmtAmt'])}</td>
+      <td>${docCell}</td>
+      <td style="text-align:center"><span class="badge b-currency">${esc(r['Currency'])||'—'}</span></td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${fmtNum(r['ContractAmtLocal'])}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${fmtNum(r['BilledAmtLocal'])}</td>
+      <td style="white-space:nowrap;color:var(--text-dim)">${parseGoogleDate(r['RenewalDate'])}</td>
       <td style="color:var(--text-muted);font-size:12px;min-width:100px">${esc(r['Notes'])||''}</td>
     </tr>`;
   }).join('');
@@ -354,10 +404,10 @@ function renderTable(rows) {
 
 // ── Peek ranking modal ──
 const PEEK_CONFIG = {
-  contracted: { title: 'Ranking by Contract Amount (USD)', col: 'ContractAmt',  head: 'Contract Amt.' },
-  billed:     { title: 'Ranking by Billed Amount (USD)',   col: 'BilledAmt',    head: 'Billed Amt.'   },
-  remaining:  { title: 'Ranking by Remaining to Bill',     col: null,           head: 'Remaining'     },
-  active:     { title: 'Active Engagements by Contract',   col: 'ContractAmt',  head: 'Contract Amt.', filterStatus: 'Active' },
+  contracted: { title: 'Ranking by Contract Amount (USD)', col: 'ContractAmt', head: 'Contract Amt. (USD)' },
+  billed:     { title: 'Ranking by Billed Amount (USD)',   col: 'BilledAmt',   head: 'Billed Amt. (USD)'  },
+  remaining:  { title: 'Ranking by Remaining to Bill',     col: null,          head: 'Remaining (USD)'    },
+  active:     { title: 'Active Engagements by Contract Amount', col: 'ContractAmt', head: 'Contract Amt. (USD)', filterStatus: 'Active' },
 };
 
 function openPeek(type) {
@@ -365,28 +415,31 @@ function openPeek(type) {
   let rows = [...allRows];
   if (cfg.filterStatus) rows = rows.filter(r => r['Status'] === cfg.filterStatus);
 
-  let sorted;
+  let items;
   if (type === 'remaining') {
-    sorted = rows.map(r => ({
-      client: r['Client'],
+    items = rows.map(r => ({
+      client: r['Client'], scope: r['Scope'],
       val: (parseFloat(r['ContractAmt'])||0) - (parseFloat(r['BilledAmt'])||0)
-    })).filter(r => r.val > 0).sort((a,b) => b.val - a.val);
+    })).filter(r => r.val > 0);
   } else {
-    sorted = rows.map(r => ({
-      client: r['Client'],
+    items = rows.map(r => ({
+      client: r['Client'], scope: r['Scope'],
       val: parseFloat(r[cfg.col]) || 0
-    })).sort((a,b) => b.val - a.val);
+    }));
   }
+  // Sort and group by firm, keeping individual scope rows for detail
+  items.sort((a, b) => b.val - a.val);
 
   document.getElementById('peekTitle').textContent = cfg.title;
   document.getElementById('peekColHead').textContent = cfg.head;
-  document.getElementById('peekBody').innerHTML = sorted.slice(0, 10).map((r, i) =>
+  document.getElementById('peekBody').innerHTML = items.slice(0, 15).map((r, i) =>
     `<tr>
-      <td class="peek-rank">${i+1}</td>
-      <td>${esc(r.client)}</td>
-      <td style="text-align:right;font-weight:500">${fmt(r.val)}</td>
+      <td class="peek-rank">${i + 1}</td>
+      <td style="font-weight:500">${esc(r.client)}</td>
+      <td><div class="peek-scope">${esc(r.scope)}</div></td>
+      <td style="text-align:right;font-weight:600;color:var(--teal)">${fmt(r.val)}</td>
     </tr>`
-  ).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:16px">No data</td></tr>';
+  ).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px">No data</td></tr>';
 
   document.getElementById('peekBg').classList.add('open');
 }
@@ -395,12 +448,21 @@ function closePeekBg(e) { if (e.target === document.getElementById('peekBg')) cl
 
 // ── Helpers ──
 function setLoading() { document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="19"><span class="spinner"></span> Loading data…</td></tr>`; }
-function setEmpty(msg) { document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="19">${esc(msg)}</td></tr>`; }
-function setError(msg) { document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="19" style="color:#A32D2D">${esc(msg)}</td></tr>`; }
+function setEmpty(m)  { document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="19">${esc(m)}</td></tr>`; }
+function setError(m)  { document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="19" style="color:#f87171">${esc(m)}</td></tr>`; }
 
-const fmt    = v => (!v && v!==0) || isNaN(v) ? '—' : '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 0 });
-const fmtNum = v => (!v || isNaN(parseFloat(v))) ? '—' : Number(parseFloat(v)).toLocaleString('en-US', { minimumFractionDigits: 0 });
-const esc    = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// Full number display — no rounding to thousands
+const fmt = v => {
+  const n = parseFloat(v);
+  if (isNaN(n)) return '—';
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+const fmtNum = v => {
+  const n = parseFloat(v);
+  if (isNaN(n) || !v) return '—';
+  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 function typeBadge(t) {
   if (!t) return '—';
