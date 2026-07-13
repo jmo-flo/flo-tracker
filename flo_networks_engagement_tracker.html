@@ -23,14 +23,35 @@
   .header-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
   .last-updated { font-size: 12px; color: var(--text-dim); }
   .main { padding: 24px 32px 40px; }
+
+  /* ── Metrics ── */
   .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
-  .metric { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; }
+  .metric { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; cursor: pointer; transition: box-shadow .15s; position: relative; }
+  .metric:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
   .metric-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
   .metric-value { font-size: 24px; font-weight: 500; }
   .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .metric-hint { font-size: 10px; color: var(--text-dim); margin-top: 6px; }
+
+  /* ── Peek modal ── */
+  .peek-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:200; align-items:center; justify-content:center; }
+  .peek-bg.open { display:flex; }
+  .peek-box { background:var(--bg); border-radius:var(--radius-lg); border:0.5px solid var(--border); padding:24px; width:420px; max-width:95vw; max-height:80vh; overflow-y:auto; }
+  .peek-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .peek-title { font-size:15px; font-weight:500; }
+  .peek-close { background:none; border:none; cursor:pointer; font-size:20px; color:var(--text-muted); line-height:1; }
+  .peek-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .peek-table th { text-align:left; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; padding:6px 8px; border-bottom:0.5px solid var(--border); }
+  .peek-table td { padding:8px 8px; border-bottom:0.5px solid var(--border); }
+  .peek-table tr:last-child td { border-bottom:none; }
+  .peek-rank { font-size:11px; color:var(--text-dim); font-weight:500; width:20px; }
+
+  /* ── Filters ── */
   .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
   .filter-bar select, .filter-bar input { padding: 7px 11px; border: 0.5px solid var(--border-md); border-radius: var(--radius); font-size: 13px; background: var(--bg); color: var(--text); }
   .filter-bar input { flex: 1; min-width: 180px; }
+
+  /* ── Table ── */
   .table-wrap { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
   .table-scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -38,16 +59,26 @@
   tbody td { padding: 11px 14px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover td { background: var(--bg-soft); }
+
+  /* ── Badges ── */
   .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
   .b-audit { background: var(--blue-bg); color: var(--blue); }
   .b-consulting { background: var(--purple-bg); color: var(--purple); }
   .b-active { background: var(--green-bg); color: var(--green); }
   .b-pending { background: var(--amber-bg); color: var(--amber); }
   .b-closed { background: var(--gray-bg); color: var(--gray); }
+
+  /* ── Progress ── */
   .prog-wrap { width: 60px; }
   .prog-pct { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
   .prog-bar { height: 5px; background: var(--bg-subtle); border-radius: 3px; overflow: hidden; }
   .prog-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+
+  /* ── Link icon ── */
+  .doc-link { color: var(--blue); text-decoration: none; font-size: 16px; }
+  .doc-link:hover { opacity: 0.7; }
+
+  /* ── States ── */
   .state-row td { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px; }
   .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border-md); border-top-color: var(--text-muted); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 8px; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -76,13 +107,36 @@
 </header>
 
 <main class="main">
+
+  <!-- KPI Cards -->
   <div class="metrics" id="metrics">
-    <div class="metric"><div class="metric-label">Total Contracted</div><div class="metric-value" id="mContracted">—</div><div class="metric-sub" id="mCount">— engagements</div></div>
-    <div class="metric"><div class="metric-label">Total Billed</div><div class="metric-value" id="mBilled">—</div><div class="metric-sub" id="mPct">—% of portfolio</div></div>
-    <div class="metric"><div class="metric-label">Remaining to Bill</div><div class="metric-value" id="mRemaining">—</div><div class="metric-sub">Outstanding balance</div></div>
-    <div class="metric"><div class="metric-label">Active</div><div class="metric-value" id="mActive">—</div><div class="metric-sub" id="mPending">— pending signature</div></div>
+    <div class="metric" onclick="openPeek('contracted')">
+      <div class="metric-label">Total Contracted (USD)</div>
+      <div class="metric-value" id="mContracted">—</div>
+      <div class="metric-sub" id="mCount">— engagements</div>
+      <div class="metric-hint">↗ Click to see ranking</div>
+    </div>
+    <div class="metric" onclick="openPeek('billed')">
+      <div class="metric-label">Total Billed (USD)</div>
+      <div class="metric-value" id="mBilled">—</div>
+      <div class="metric-sub" id="mPct">—% of portfolio</div>
+      <div class="metric-hint">↗ Click to see ranking</div>
+    </div>
+    <div class="metric" onclick="openPeek('remaining')">
+      <div class="metric-label">Remaining to Bill (USD)</div>
+      <div class="metric-value" id="mRemaining">—</div>
+      <div class="metric-sub">Outstanding balance</div>
+      <div class="metric-hint">↗ Click to see ranking</div>
+    </div>
+    <div class="metric" onclick="openPeek('active')">
+      <div class="metric-label">Active</div>
+      <div class="metric-value" id="mActive">—</div>
+      <div class="metric-sub" id="mPending">— pending signature</div>
+      <div class="metric-hint">↗ Click to see ranking</div>
+    </div>
   </div>
 
+  <!-- Filters -->
   <div class="filter-bar">
     <select id="fType" onchange="applyFilters()">
       <option value="">All types</option>
@@ -95,32 +149,44 @@
       <option value="Pending signature">Pending signature</option>
       <option value="Closed">Closed</option>
     </select>
+    <select id="fSubsidiary" onchange="applyFilters()">
+      <option value="">All subsidiaries</option>
+    </select>
     <select id="fOwner" onchange="applyFilters()">
       <option value="">All owners</option>
     </select>
     <input id="fSearch" type="text" placeholder="Search client or firm…" oninput="applyFilters()" />
   </div>
 
+  <!-- Table -->
   <div class="table-wrap">
     <div class="table-scroll">
       <table>
         <thead>
           <tr>
             <th>Client / Firm</th>
+            <th>Subsidiary</th>
             <th>Type</th>
             <th>Scope</th>
             <th>Internal Owner</th>
+            <th>Doc</th>
             <th>Signed</th>
             <th>Expires</th>
-            <th>Contract Amt.</th>
-            <th>Billed Amt.</th>
+            <th>Renewal Date</th>
+            <th>Currency</th>
+            <th>Contract Amt. (USD)</th>
+            <th>Billed Amt. (USD)</th>
+            <th>Next Pmt. Date</th>
+            <th>Next Pmt. (USD)</th>
+            <th>Contract Amt. (Local)</th>
+            <th>Billed Amt. (Local)</th>
             <th>Progress</th>
             <th>Status</th>
             <th>Notes</th>
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr class="state-row"><td colspan="11"><span class="spinner"></span> Loading data…</td></tr>
+          <tr class="state-row"><td colspan="19"><span class="spinner"></span> Loading data…</td></tr>
         </tbody>
       </table>
     </div>
@@ -129,50 +195,75 @@
   <div class="foot" id="foot"></div>
 </main>
 
+<!-- Peek Modal -->
+<div class="peek-bg" id="peekBg" onclick="closePeekBg(event)">
+  <div class="peek-box">
+    <div class="peek-header">
+      <div class="peek-title" id="peekTitle">Ranking</div>
+      <button class="peek-close" onclick="closePeek()">✕</button>
+    </div>
+    <table class="peek-table">
+      <thead><tr><th>#</th><th>Client / Firm</th><th id="peekColHead" style="text-align:right">Amount</th></tr></thead>
+      <tbody id="peekBody"></tbody>
+    </table>
+  </div>
+</div>
+
 <script>
 const HARDCODED_URL = 'https://docs.google.com/spreadsheets/d/12fWw8jpJjMVI_7DvlsXen3v0aZElPRmQdEEMpvWUUB8/gviz/tq?tqx=out:json';
 
 let allRows = [];
 
-window.addEventListener('DOMContentLoaded', () => {
-  fetchSheet(HARDCODED_URL);
-});
+window.addEventListener('DOMContentLoaded', () => { fetchSheet(HARDCODED_URL); });
+
+// ── Parse Google's Date(yyyy,m,d) format ──
+function parseGoogleDate(val) {
+  if (!val) return '';
+  // gviz returns dates as "Date(2024,0,15)" — month is 0-indexed
+  const m = String(val).match(/^Date\((\d+),(\d+),(\d+)\)/);
+  if (m) {
+    const y = parseInt(m[1]), mo = parseInt(m[2]), d = parseInt(m[3]);
+    const dt = new Date(y, mo, d);
+    return dt.toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
+  }
+  // Already a plain date string
+  if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    const dt = new Date(val + 'T00:00:00');
+    return isNaN(dt) ? val : dt.toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
+  }
+  return val;
+}
 
 async function fetchSheet(url) {
   setLoading();
   try {
-    let gvizUrl;
-    if (url.includes('gviz/tq')) {
-      gvizUrl = url;
-    } else {
-      const mReg = url.match(/spreadsheets\/d\/([^\/]+)/);
-      if (!mReg) throw new Error('Could not parse a Google Sheets ID from that URL.');
-      gvizUrl = `https://docs.google.com/spreadsheets/d/${mReg[1]}/gviz/tq?tqx=out:json`;
-    }
+    let gvizUrl = url.includes('gviz/tq') ? url :
+      `https://docs.google.com/spreadsheets/d/${(url.match(/spreadsheets\/d\/([^\/]+)/)||[])[1]}/gviz/tq?tqx=out:json`;
 
     const res = await fetch(gvizUrl);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const raw = await res.text();
-
     const jsonStr = raw.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, '');
     const json = JSON.parse(jsonStr);
-
-    if (!json.table || !json.table.cols) throw new Error('Unexpected response. Make sure the sheet is published to the web.');
+    if (!json.table || !json.table.cols) throw new Error('Unexpected response. Make sure the sheet is published.');
 
     const cols = json.table.cols.map(c => (c.label || c.id || '').trim());
+
     allRows = (json.table.rows || []).map(row => {
       const r = {};
       cols.forEach((col, i) => {
         const cell = row.c ? row.c[i] : null;
-        r[col] = (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v) : '';
+        // Use formatted value (f) first, then raw value (v)
+        r[col] = (cell && cell.f !== null && cell.f !== undefined) ? String(cell.f) :
+                 (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v) : '';
       });
       return r;
     }).filter(r => r['Client'] || r['Scope']);
 
-    if (allRows.length === 0) throw new Error('No data rows found. Check headers in row 1: Client, Type, Scope, Owner, SignedDate, ExpiryDate, ContractAmt, BilledAmt, Status, Notes');
+    if (allRows.length === 0) throw new Error('No data rows found. Check headers: Client, Type, Scope, Owner, Subsidiary, DocLink, SignedDate, ExpiryDate, RenewalDate, Currency, ContractAmt, BilledAmt, NextPmtDate, NextPmtAmt, ContractAmtLocal, BilledAmtLocal, Status, Notes');
 
     document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleString('en-US', { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-    populateOwnerFilter();
+    populateFilters();
     applyFilters();
   } catch (err) {
     setError('Could not load data: ' + err.message);
@@ -183,29 +274,33 @@ function applyFilters() {
   const t = document.getElementById('fType').value;
   const s = document.getElementById('fStatus').value;
   const o = document.getElementById('fOwner').value;
+  const sub = document.getElementById('fSubsidiary').value;
   const q = document.getElementById('fSearch').value.toLowerCase();
   const rows = allRows.filter(r =>
-    (!t || r['Type'] === t) &&
-    (!s || r['Status'] === s) &&
-    (!o || r['Owner'] === o) &&
-    (!q || (r['Client']||'').toLowerCase().includes(q) || (r['Scope']||'').toLowerCase().includes(q))
+    (!t   || r['Type'] === t) &&
+    (!s   || r['Status'] === s) &&
+    (!o   || r['Owner'] === o) &&
+    (!sub || r['Subsidiary'] === sub) &&
+    (!q   || (r['Client']||'').toLowerCase().includes(q) || (r['Scope']||'').toLowerCase().includes(q))
   );
   renderMetrics(rows);
   renderTable(rows);
   document.getElementById('foot').textContent = rows.length + ' of ' + allRows.length + ' records';
 }
 
-function populateOwnerFilter() {
+function populateFilters() {
   const owners = [...new Set(allRows.map(r => r['Owner']).filter(Boolean))].sort();
-  const sel = document.getElementById('fOwner');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">All owners</option>' + owners.map(o => `<option value="${esc(o)}"${cur===o?' selected':''}>${esc(o)}</option>`).join('');
+  const subs   = [...new Set(allRows.map(r => r['Subsidiary']).filter(Boolean))].sort();
+  const oSel = document.getElementById('fOwner');
+  const sSel = document.getElementById('fSubsidiary');
+  oSel.innerHTML = '<option value="">All owners</option>'      + owners.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
+  sSel.innerHTML = '<option value="">All subsidiaries</option>' + subs.map(s  => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
 }
 
 function renderMetrics(rows) {
   const sum = k => rows.reduce((s, r) => s + (parseFloat(r[k]) || 0), 0);
-  const totalC = sum('ContractAmt');
-  const totalB = sum('BilledAmt');
+  const totalC  = sum('ContractAmt');
+  const totalB  = sum('BilledAmt');
   const active  = rows.filter(r => r['Status'] === 'Active').length;
   const pending = rows.filter(r => r['Status'] === 'Pending signature').length;
   const pct = totalC > 0 ? Math.round((totalB / totalC) * 100) : 0;
@@ -219,62 +314,102 @@ function renderMetrics(rows) {
 }
 
 function renderTable(rows) {
-  const tbody = document.getElementById('tbody');
   if (rows.length === 0) { setEmpty('No records match the selected filters.'); return; }
-  tbody.innerHTML = rows.map(r => {
-    const c = parseFloat(r['ContractAmt']) || 0;
-    const b = parseFloat(r['BilledAmt'])   || 0;
-    const p = c > 0 ? Math.min(Math.round((b / c) * 100), 100) : 0;
+  document.getElementById('tbody').innerHTML = rows.map(r => {
+    const c  = parseFloat(r['ContractAmt']) || 0;
+    const b  = parseFloat(r['BilledAmt'])   || 0;
+    const p  = c > 0 ? Math.min(Math.round((b / c) * 100), 100) : 0;
     const fc = p >= 100 ? '#1D9E75' : p >= 50 ? '#378ADD' : '#EF9F27';
+    const docCell = r['DocLink']
+      ? `<a class="doc-link" href="${esc(r['DocLink'])}" target="_blank" title="Open document">📄</a>`
+      : '—';
     return `<tr>
-      <td style="font-weight:500; white-space:nowrap">${esc(r['Client'])}</td>
+      <td style="font-weight:500;white-space:nowrap">${esc(r['Client'])}</td>
+      <td style="white-space:nowrap">${esc(r['Subsidiary'])||'—'}</td>
       <td>${typeBadge(r['Type'])}</td>
-      <td style="color:var(--text-muted); min-width:140px">${esc(r['Scope'])}</td>
-      <td style="white-space:nowrap">${esc(r['Owner']) || '—'}</td>
-      <td style="white-space:nowrap; color:var(--text-muted)">${fmtDate(r['SignedDate'])}</td>
-      <td style="white-space:nowrap; color:var(--text-muted)">${fmtDate(r['ExpiryDate'])}</td>
+      <td style="color:var(--text-muted);min-width:140px">${esc(r['Scope'])}</td>
+      <td style="white-space:nowrap">${esc(r['Owner'])||'—'}</td>
+      <td style="text-align:center">${docCell}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${parseGoogleDate(r['SignedDate'])}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${parseGoogleDate(r['ExpiryDate'])}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${parseGoogleDate(r['RenewalDate'])}</td>
+      <td style="text-align:center"><span class="badge b-closed">${esc(r['Currency'])||'—'}</span></td>
       <td style="white-space:nowrap">${fmt(c)}</td>
       <td style="white-space:nowrap">${fmt(b)}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${parseGoogleDate(r['NextPmtDate'])}</td>
+      <td style="white-space:nowrap">${fmtNum(r['NextPmtAmt'])}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${fmtNum(r['ContractAmtLocal'])}</td>
+      <td style="white-space:nowrap;color:var(--text-muted)">${fmtNum(r['BilledAmtLocal'])}</td>
       <td>
         <div class="prog-wrap">
           <div class="prog-pct">${p}%</div>
-          <div class="prog-bar"><div class="prog-fill" style="width:${p}%; background:${fc}"></div></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${p}%;background:${fc}"></div></div>
         </div>
       </td>
       <td>${statusBadge(r['Status'])}</td>
-      <td style="color:var(--text-muted); font-size:12px; min-width:100px">${esc(r['Notes']) || ''}</td>
+      <td style="color:var(--text-muted);font-size:12px;min-width:100px">${esc(r['Notes'])||''}</td>
     </tr>`;
   }).join('');
 }
 
-function setLoading() {
-  document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="11"><span class="spinner"></span> Loading data…</td></tr>`;
-}
-function setEmpty(msg) {
-  document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="11">${esc(msg)}</td></tr>`;
-}
-function setError(msg) {
-  document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="11" style="color:#A32D2D">${esc(msg)}</td></tr>`;
-}
-
-const fmt = v => isNaN(v) || v === '' ? '—' : '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 0 });
-const fmtDate = d => {
-  if (!d) return '—';
-  const dt = new Date(d + 'T00:00:00');
-  return isNaN(dt) ? d : dt.toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
+// ── Peek ranking modal ──
+const PEEK_CONFIG = {
+  contracted: { title: 'Ranking by Contract Amount (USD)', col: 'ContractAmt',  head: 'Contract Amt.' },
+  billed:     { title: 'Ranking by Billed Amount (USD)',   col: 'BilledAmt',    head: 'Billed Amt.'   },
+  remaining:  { title: 'Ranking by Remaining to Bill',     col: null,           head: 'Remaining'     },
+  active:     { title: 'Active Engagements by Contract',   col: 'ContractAmt',  head: 'Contract Amt.', filterStatus: 'Active' },
 };
-const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function openPeek(type) {
+  const cfg = PEEK_CONFIG[type];
+  let rows = [...allRows];
+  if (cfg.filterStatus) rows = rows.filter(r => r['Status'] === cfg.filterStatus);
+
+  let sorted;
+  if (type === 'remaining') {
+    sorted = rows.map(r => ({
+      client: r['Client'],
+      val: (parseFloat(r['ContractAmt'])||0) - (parseFloat(r['BilledAmt'])||0)
+    })).filter(r => r.val > 0).sort((a,b) => b.val - a.val);
+  } else {
+    sorted = rows.map(r => ({
+      client: r['Client'],
+      val: parseFloat(r[cfg.col]) || 0
+    })).sort((a,b) => b.val - a.val);
+  }
+
+  document.getElementById('peekTitle').textContent = cfg.title;
+  document.getElementById('peekColHead').textContent = cfg.head;
+  document.getElementById('peekBody').innerHTML = sorted.slice(0, 10).map((r, i) =>
+    `<tr>
+      <td class="peek-rank">${i+1}</td>
+      <td>${esc(r.client)}</td>
+      <td style="text-align:right;font-weight:500">${fmt(r.val)}</td>
+    </tr>`
+  ).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:16px">No data</td></tr>';
+
+  document.getElementById('peekBg').classList.add('open');
+}
+function closePeek() { document.getElementById('peekBg').classList.remove('open'); }
+function closePeekBg(e) { if (e.target === document.getElementById('peekBg')) closePeek(); }
+
+// ── Helpers ──
+function setLoading() { document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="19"><span class="spinner"></span> Loading data…</td></tr>`; }
+function setEmpty(msg) { document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="19">${esc(msg)}</td></tr>`; }
+function setError(msg) { document.getElementById('tbody').innerHTML = `<tr class="state-row"><td colspan="19" style="color:#A32D2D">${esc(msg)}</td></tr>`; }
+
+const fmt    = v => (!v && v!==0) || isNaN(v) ? '—' : '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 0 });
+const fmtNum = v => (!v || isNaN(parseFloat(v))) ? '—' : Number(parseFloat(v)).toLocaleString('en-US', { minimumFractionDigits: 0 });
+const esc    = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 function typeBadge(t) {
   if (!t) return '—';
-  const cls = t.toLowerCase().includes('audit') ? 'b-audit' : 'b-consulting';
-  return `<span class="badge ${cls}">${esc(t)}</span>`;
+  return `<span class="badge ${t.toLowerCase().includes('audit')?'b-audit':'b-consulting'}">${esc(t)}</span>`;
 }
 function statusBadge(s) {
-  const map = { 'Active':'b-active', 'Pending signature':'b-pending', 'Closed':'b-closed' };
-  return `<span class="badge ${map[s] || 'b-closed'}">${esc(s) || '—'}</span>`;
+  const m = { 'Active':'b-active', 'Pending signature':'b-pending', 'Closed':'b-closed' };
+  return `<span class="badge ${m[s]||'b-closed'}">${esc(s)||'—'}</span>`;
 }
 </script>
-
 </body>
 </html>
